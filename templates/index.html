@@ -11,8 +11,22 @@
         <p>Ваш личный список задач.</p>
 
         <!-- Кнопки -->
-        <a href="{% url 'tasks_list' %}" class="btn btn-primary">Посмотреть список задач</a>
+        <a href="{% url 'task_list' %}" class="btn btn-primary">Посмотреть список задач</a>
         <a href="{% url 'task_create' %}" class="btn btn-success">Добавить задачу</a>
+            <h2 class="mt-4">Последние задачи</h2>
+    <ul class="list-group">
+        {% for task in tasks %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ task.title }}</strong>
+                    <span class="badge bg-secondary">{{ task.get_status_display }}</span>
+                </div>
+                <a href="{% url 'task_detail' task.id %}" class="btn btn-info btn-sm">Подробнее</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">Задач пока нет.</li>
+        {% endfor %}
+    </ul>
     </div>
 </body>
 </html>
