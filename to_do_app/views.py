@@ -1,4 +1,4 @@
-from django.shortcuts import render ,get_object_or_404
+from django.shortcuts import render ,get_object_or_404,redirect,reverse
 from .models import Task
 
 def index_view(request):
@@ -15,6 +15,7 @@ def task_detail(request, task_id):
 
 def add_task_view(request):
     if request.method == 'POST':
+        title = request.POST.get('title')
         description = request.POST.get('description')
         status = request.POST.get('status', 'new')
         date = request.POST.get('due_date')
@@ -22,11 +23,12 @@ def add_task_view(request):
         Task.objects.create(
             description=description,
             status=status,
-            data=date,
+            due_date=date,
+            title=title
         )
 
         tasks = Task.objects.all()
-        return render(request, "task_list.html", {"tasks": tasks})
+        return redirect(reverse('task_list'))
 
     return render(request, 'task_form.html')
 
@@ -34,9 +36,7 @@ def add_task_view(request):
 
 
 def delete_task_view(request, task_id):
-    task = Task.objects.filter(id=task_id).first()
-    if task:
-        task.delete()
+    task = get_object_or_404(Task, id=task_id)
+    task.delete()
 
-    tasks = Task.objects.all()
-    return render(request, 'task_list.html', {'tasks': tasks})
+    return redirect(reverse('task_list'))
