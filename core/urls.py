@@ -16,12 +16,38 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from to_do_app.views import task_list_view,add_task_view,index_view,delete_task_view,task_detail
+from to_do_app.views import task_list_view, add_task_view, index_view, delete_task_view, task_detail, TaskListCreateAPIView, TaskRetrieveUpdateDestroyAPIView
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("", index_view, name="index"),
-    path("list/", task_list_view, name="task_list"),
-    path("tasks/<int:task_id>/", task_detail, name="task_detail"),
-    path("tasks/add/", add_task_view, name="task_create"),
-    path("tasks/<int:task_id>/delete/", delete_task_view, name="delete_task"),
+    path(
+        'admin/',
+        admin.site.urls),
+    path(
+        "",
+        index_view,
+        name="index"),
+    path(
+        "list/",
+        task_list_view,
+        name="task_list"),
+    path(
+        "tasks/<int:task_id>/",
+        task_detail,
+        name="task_detail"),
+    path(
+        "tasks/add/",
+        add_task_view,
+        name="task_create"),
+    path(
+        "tasks/<int:task_id>/delete/",
+        delete_task_view,
+        name="delete_task"),
+    path(
+        'api/tasks/',
+        TaskListCreateAPIView.as_view(),
+        name='task_list_create'),
+    path(
+        'api/tasks/<int:pk>/',
+        TaskRetrieveUpdateDestroyAPIView.as_view(),
+        name='task_detail_update_delete'),
 ]
