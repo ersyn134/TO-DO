@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Главная страница</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
+    <div class="container mt-4">
+        <h1>Добро пожаловать в To-Do List</h1>
+        <p>Ваш личный список задач.</p>
 
+        <!-- Кнопки -->
+        <a href="{% url 'tasks_list' %}" class="btn btn-primary">Посмотреть список задач</a>
+        <a href="{% url 'task_create' %}" class="btn btn-success">Добавить задачу</a>
+    </div>
 </body>
 </html>
