@@ -16,7 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+from to_do_app.views import task_list_view,add_task_view,index_view,delete_task_view,task_detail
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("", index_view, name="index"),
+    path("list/", task_list_view, name="task_list"),
+    path("tasks/<int:task_id>/", task_detail, name="task_detail"),
+    path("tasks/add/", add_task_view, name="task_create"),
+    path("tasks/<int:task_id>/delete/", delete_task_view, name="delete_task"),
 ]

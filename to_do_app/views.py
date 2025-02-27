@@ -2,12 +2,16 @@ from django.shortcuts import render ,get_object_or_404
 from .models import Task
 
 def index_view(request):
-    return render(request, 'index.html')
+    tasks = Task.objects.all()
+    return render(request, "index.html", {"tasks": tasks})
 
 def task_list_view(request):
     tasks = Task.objects.all()
-    return render(request, 'tasks_list.html', {'tasks': tasks})
+    return render(request, 'task_list.html', {'tasks': tasks})
 
+def task_detail(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    return render(request, "task_detail.html", {"task": task})
 
 def add_task_view(request):
     if request.method == 'POST':
@@ -22,7 +26,7 @@ def add_task_view(request):
         )
 
         tasks = Task.objects.all()
-        return render(request, "tasks_list.html", {"tasks": tasks})
+        return render(request, "task_list.html", {"tasks": tasks})
 
     return render(request, 'task_form.html')
 
@@ -30,9 +34,9 @@ def add_task_view(request):
 
 
 def delete_task_view(request, task_id):
-    task = Task.objects.filter(id=task_id).first()  # Ищем задачу, но не вызываем 404
+    task = Task.objects.filter(id=task_id).first()
     if task:
         task.delete()
 
-    tasks = Task.objects.all()  # Получаем обновленный список задач
-    return render(request, 'tasks_list.html', {'tasks': tasks})
+    tasks = Task.objects.all()
+    return render(request, 'task_list.html', {'tasks': tasks})
