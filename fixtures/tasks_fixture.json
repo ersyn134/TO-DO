@@ -1,0 +1,52 @@
+[
+{
+    "model": "to_do_app.task",
+    "pk": 1,
+    "fields": {
+        "title": null,
+        "description": "Купить молоко",
+        "status": "new",
+        "due_date": "2025-03-01"
+    }
+},
+{
+    "model": "to_do_app.task",
+    "pk": 2,
+    "fields": {
+        "title": null,
+        "description": "Подготовиться к экзамену",
+        "status": "in_progress",
+        "due_date": "2025-03-05"
+    }
+},
+{
+    "model": "to_do_app.task",
+    "pk": 3,
+    "fields": {
+        "title": null,
+        "description": "Записаться к врачу",
+        "status": "done",
+        "due_date": "2025-02-28"
+    }
+},
+{
+    "model": "to_do_app.task",
+    "pk": 4,
+    "fields": {
+        "title": null,
+        "description": "Сделать уборку",
+        "status": "new",
+        "due_date": "2025-03-10"
+    }
+},
+{
+    "model": "to_do_app.task",
+    "pk": 5,
+    "fields": {
+        "title": null,
+        "description": "Отправить отчет",
+        "status": "in_progress",
+        "due_date": "2025-03-03"
+    }
+}
+]
