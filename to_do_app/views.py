@@ -1,62 +1,104 @@
+from datetime import datetime
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from django.shortcuts import render, get_object_or_404, redirect, reverse
-import json
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from .models import Task
 
 
-@csrf_exempt
-def task_list(request):
-    if request.method == "GET":
-        tasks = list(Task.objects.values())
-        return JsonResponse(tasks, safe=False)
+class TaskDetailView(APIView):
+    def get(self, request, id):
+        task = get_object_or_404(Task, id=id)
+        return Response({
+            'id': task.id,
+            'title': task.title,
+            'description': task.description or "No description",
+            'status': task.status,
+            'date': task.due_date.isoformat() if task.due_date else None
+        }, status=status.HTTP_200_OK)
 
-    elif request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            task = Task.objects.create(
-                title=data.get("title", ""),
-                description=data.get("description", ""),
-                status=data.get("status", "pending"),
-                due_date=data.get("due_date", None)
-            )
-            return JsonResponse(
-                {"id": task.id, "message": "Task created"}, status=201)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+    def put(self, request, id):
+        task = get_object_or_404(Task, id=id)
 
+        title = request.data.get('title', task.title)
+        description = request.data.get('description', task.description)
+        status_value = request.data.get('status', task.status)
+        due_date = request.data.get('date', task.due_date)
 
-@csrf_exempt
-def task_api_detail(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id)
-    except Task.DoesNotExist:
-        return JsonResponse({"error": "Task not found"}, status=404)
+        if due_date:
+            try:
+                due_date = datetime.strptime(due_date, "%Y-%m-%d").date()
+            except ValueError:
+                return Response(
+                    {'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == "GET":
-        return JsonResponse({
-            "id": task.id,
-            "title": task.title,
-            "description": task.description,
-            "status": task.status,
-            "due_date": task.due_date.strftime("%Y-%m-%d") if task.due_date else None
-        })
+        task.title = title
+        task.description = description
+        task.status = status_value
+        task.due_date = due_date
+        task.save()
 
-    elif request.method == "PUT":
-        try:
-            data = json.loads(request.body)
-            task.title = data.get("title", task.title)
-            task.description = data.get("description", task.description)
-            task.status = data.get("status", task.status)
-            task.due_date = data.get("due_date", task.due_date)
-            task.save()
-            return JsonResponse({"message": "Task updated"})
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+        return Response({
+            'id': task.id,
+            'title': task.title,
+            'description': task.description,
+            'status': task.status,
+            'date': task.due_date.isoformat() if task.due_date else None
+        }, status=status.HTTP_200_OK)
 
-    elif request.method == "DELETE":
+    def delete(self, request, id):
+        task = get_object_or_404(Task, id=id)
         task.delete()
-        return JsonResponse({"message": "Task deleted"}, status=204)
+        return Response({'message': 'Task deleted successfully'},
+                        status=status.HTTP_204_NO_CONTENT)
+
+
+class TaskListView(APIView):
+    def get(self, request):
+        tasks = Task.objects.all()
+        task_list = [{
+            'id': task.id,
+            'title': task.title,
+            'description': task.description or "No description",
+            'status': task.status,
+            'date': task.due_date.isoformat() if task.due_date else None
+        } for task in tasks]
+
+        return Response(task_list, status=status.HTTP_200_OK)
+
+
+class TaskCreateView(APIView):
+    def post(self, request):
+        title = request.data.get('title')
+        description = request.data.get('description')
+        status_value = request.data.get('status', 'new')
+        due_date = request.data.get('date')
+
+        if not title or not description or not status_value:
+            return Response({'error': 'All fields are required.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if due_date:
+            try:
+                due_date = datetime.strptime(due_date, "%Y-%m-%d").date()
+            except ValueError:
+                return Response(
+                    {'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        task = Task.objects.create(
+            title=title,
+            description=description,
+            status=status_value,
+            due_date=due_date
+        )
+
+        return Response({
+            'id': task.id,
+            'title': task.title,
+            'description': task.description,
+            'status': task.status,
+            'date': task.due_date.isoformat() if task.due_date else None
+        }, status=status.HTTP_201_CREATED)
 
 
 def index_view(request):
